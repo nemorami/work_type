@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QButtonGroup>
 #include <QCheckBox>
-
+#include <QtSql/QSqlDatabase>
 #include "worktypesettings.h"
 
 QT_BEGIN_NAMESPACE
@@ -18,10 +18,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void readDataFile();
 
 private:
     Ui::MainWindow *ui;
     WorkTypeSettings *worktype;
+     QSqlDatabase db;
+
 private slots:
     void on_pushButton_clicked();
 

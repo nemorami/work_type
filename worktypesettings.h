@@ -3,7 +3,8 @@
 
 #include <QDialog>
 #include <QPushButton>
-#include <QStandardItemModel>
+#include <QtSql/QSqlTableModel>
+
 namespace Ui {
 class WorkTypeSettings;
 }
@@ -18,7 +19,7 @@ public:
 
 private:
     Ui::WorkTypeSettings *ui;
-    QStandardItemModel *model;
+    QSqlTableModel model;
 
 private slots:
     void customConextMenuRequested(QPoint pos);
