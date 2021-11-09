@@ -20,13 +20,26 @@ public:
     ~MainWindow();
     void readDataFile();
 
+    QString getNextWorktype(QString name, QString init_work);
+    QPair<QString, QDate> getLastWorktype(QString name);
+    void setTodayReport();
+
 private:
     Ui::MainWindow *ui;
     WorkTypeSettings *worktype;
-     QSqlDatabase db;
+    QSqlDatabase db;
+    QSqlQueryModel month_model;
 
 private slots:
-    void on_pushButton_clicked();
+   // void on_pushButton_clicked();
+    void on_deployPushButton_clicked();
+};
+
+struct WorkDeploy {
+    QString name;
+    QString part;
+    QString work;
+};
 
 #endif // MAINWINDOW_H
-};
+

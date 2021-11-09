@@ -22,8 +22,9 @@ private:
     QSqlTableModel model;
 
 private slots:
-    void customConextMenuRequested(QPoint pos);
-    void on_buttonBox_clicked(QAbstractButton *button);
+    void customMenuRequested(QPoint pos);
+    void on_addPushButton_clicked(bool checked=false);
+    void on_savePushButton_clicked(bool checked=false);
 };
 
 #endif // WORKTYPESETTINGS_H

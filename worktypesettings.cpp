@@ -4,7 +4,7 @@
 #include "worktypesettings.h"
 #include <QPushButton>
 #include <QMenu>
-
+#include <QDebug>
 
 WorkTypeSettings::WorkTypeSettings(QWidget *parent) :
     QDialog(parent),
@@ -19,7 +19,7 @@ WorkTypeSettings::WorkTypeSettings(QWidget *parent) :
     qDebug() << "result => " << result << "\n";
     // ui->buttonBox->button(QDialogButtonBox::Apply)->setText("&Add");
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->tableView, &QTableView::customContextMenuRequested, this, &WorkTypeSettings::customContextMenuRequested);
+    connect(ui->tableView, &QTableView::customContextMenuRequested, this, &WorkTypeSettings::customMenuRequested);
 
 
 
@@ -40,23 +40,36 @@ WorkTypeSettings::~WorkTypeSettings()
     delete ui;
 }
 
-void WorkTypeSettings::customConextMenuRequested(QPoint pos)
+void WorkTypeSettings::customMenuRequested(QPoint pos)
 {
     QMenu *menu = new QMenu(this);
-    menu->addAction(new QAction("Add", this));
+    QAction *addAction = new QAction("Add", this);
+    connect(addAction, &QAction::triggered, this, [this]() {model.insertRow(ui->tableView->model()->rowCount());});
+    menu->addAction(addAction);
     menu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
-void WorkTypeSettings::on_buttonBox_clicked(QAbstractButton *button)
+void WorkTypeSettings::on_addPushButton_clicked(bool checked)
 {
-    switch (ui->buttonBox->standardButton(button)) {
-    case QDialogButtonBox::Apply:
-        //model.insertRow(ui->tableView->model()->rowCount());
-        model.select();
-        break;
-
-    default:
-        break;
-
-    }
+    model.insertRow(ui->tableView->model()->rowCount());
 }
+
+void WorkTypeSettings::on_savePushButton_clicked(bool checked)
+{
+    model.submit();
+}
+
+
+//void WorkTypeSettings::on_buttonBox_clicked(QAbstractButton *button)
+//{
+//    switch (ui->buttonBox->standardButton(button)) {
+//    case QDialogButtonBox::Apply:
+//        //model.insertRow(ui->tableView->model()->rowCount());
+//        model.select();
+//        break;
+
+//    default:
+//        break;
+
+//    }
+//}
