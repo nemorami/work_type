@@ -42,7 +42,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_4;
     QLabel *label_2;
-    QLabel *label;
+    QLabel *lbFix;
     QVBoxLayout *verticalLayout_6;
     QLabel *label_5;
     QLabel *label_6;
@@ -91,7 +91,7 @@ public:
         month_tab->setObjectName(QString::fromUtf8("month_tab"));
         verticalLayoutWidget = new QWidget(month_tab);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 10, 160, 80));
+        verticalLayoutWidget->setGeometry(QRect(10, 10, 160, 89));
         monthVerticalLayout = new QVBoxLayout(verticalLayoutWidget);
         monthVerticalLayout->setObjectName(QString::fromUtf8("monthVerticalLayout"));
         monthVerticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -123,10 +123,10 @@ public:
 
         verticalLayout_4->addWidget(label_2);
 
-        label = new QLabel(verticalLayoutWidget_2);
-        label->setObjectName(QString::fromUtf8("label"));
+        lbFix = new QLabel(verticalLayoutWidget_2);
+        lbFix->setObjectName(QString::fromUtf8("lbFix"));
 
-        verticalLayout_4->addWidget(label);
+        verticalLayout_4->addWidget(lbFix);
 
 
         horizontalLayout->addLayout(verticalLayout_4);
@@ -263,7 +263,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 19));
+        menubar->setGeometry(QRect(0, 0, 800, 26));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -294,7 +294,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -305,7 +305,7 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(month_tab), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "\355\230\204\354\233\220", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        lbFix->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         label_5->setText(QCoreApplication::translate("MainWindow", "\354\264\235\352\267\274\353\254\264\354\235\270\354\233\220", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         label_7->setText(QCoreApplication::translate("MainWindow", "\354\240\204\354\235\274", nullptr));

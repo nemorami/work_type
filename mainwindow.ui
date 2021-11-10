@@ -17,14 +17,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>60</y>
+      <x>30</x>
+      <y>30</y>
       <width>581</width>
       <height>481</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="month_tab">
      <attribute name="title">
@@ -36,7 +36,7 @@
         <x>10</x>
         <y>10</y>
         <width>160</width>
-        <height>80</height>
+        <height>89</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="monthVerticalLayout">
@@ -79,7 +79,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="lbFix">
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -97,7 +97,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="lbCurrent">
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -111,7 +111,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_8">
+            <widget class="QLabel" name="lbAll">
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -129,7 +129,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_10">
+            <widget class="QLabel" name="lbOff">
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -142,12 +142,12 @@
            <item>
             <widget class="QLabel" name="label_11">
              <property name="text">
-              <string>연가</string>
+              <string>휴무</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_12">
+            <widget class="QLabel" name="lbVacation">
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -178,7 +178,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
+          <layout class="QVBoxLayout" name="partVerticalLayout">
            <item>
             <widget class="QLabel" name="label_13">
              <property name="text">
@@ -189,7 +189,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_11">
+          <layout class="QVBoxLayout" name="normalVerticalLayout">
            <item>
             <widget class="QLabel" name="label_17">
              <property name="text">
@@ -200,7 +200,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_12">
+          <layout class="QVBoxLayout" name="homeVerticalLayout">
            <item>
             <widget class="QLabel" name="label_14">
              <property name="text">
@@ -211,7 +211,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_13">
+          <layout class="QVBoxLayout" name="allVerticalLayout">
            <item>
             <widget class="QLabel" name="label_15">
              <property name="text">
@@ -222,11 +222,11 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_10">
+          <layout class="QVBoxLayout" name="offVerticalLayout">
            <item>
             <widget class="QLabel" name="label_16">
              <property name="text">
-              <string>TextLabel</string>
+              <string>휴무</string>
              </property>
             </widget>
            </item>
@@ -265,6 +265,13 @@
         <widget class="QPushButton" name="deployPushButton">
          <property name="text">
           <string>&amp;Deploy</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="refreshPushButton">
+         <property name="text">
+          <string>&amp;Refresh</string>
          </property>
         </widget>
        </item>

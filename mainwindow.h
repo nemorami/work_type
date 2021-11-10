@@ -5,6 +5,7 @@
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QtSql/QSqlDatabase>
+#include <QLabel>
 #include "worktypesettings.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +23,7 @@ public:
 
     QString getNextWorktype(QString name, QString init_work);
     QPair<QString, QDate> getLastWorktype(QString name);
-    void setTodayReport();
+
 
 private:
     Ui::MainWindow *ui;
@@ -30,9 +31,18 @@ private:
     QSqlDatabase db;
     QSqlQueryModel month_model;
 
+    QVector<QLabel *> lbnPart;
+    QVector<QLabel *> lbnNormal;
+    QVector<QLabel *> lbnHome;
+    QVector<QLabel *> lbnAll;
+    QVector<QLabel *> lbnOff;
+
 private slots:
-   // void on_pushButton_clicked();
+    void on_refreshPushButton_clicked();
     void on_deployPushButton_clicked();
+    void on_tabWidget_clicked(int index);
+    void setTodayReport();
+    void showMonth();
 };
 
 struct WorkDeploy {
