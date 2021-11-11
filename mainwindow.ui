@@ -259,7 +259,11 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QDateEdit" name="dateEdit"/>
+        <widget class="QDateEdit" name="dateEdit">
+         <property name="currentSection">
+          <enum>QDateTimeEdit::DaySection</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="deployPushButton">

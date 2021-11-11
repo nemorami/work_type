@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(QT_VERSION_MAJOR 5)
+#set(QT_VERSION_MAJOR 5)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Sql REQUIRED) #WebKit WebKitWidgets REQUIRED)
@@ -23,6 +23,8 @@ set(PROJECT_SOURCES
         mainwindow.ui
         worktypesettings.cpp
         worktypesettings.h
+        nsqlquerymodel.cpp
+        nsqlquerymodel.h
         worktypesettings.ui
 )
 
