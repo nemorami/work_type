@@ -7,6 +7,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QLabel>
 #include "worktypesettings.h"
+#include "nsqlquerymodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +30,7 @@ private:
     Ui::MainWindow *ui;
     WorkTypeSettings *worktype;
     QSqlDatabase db;
-    QSqlQueryModel month_model;
+    NSqlQueryModel month_model;
 
     QVector<QLabel *> lbnPart;
     QVector<QLabel *> lbnNormal;
@@ -40,9 +41,11 @@ private:
 private slots:
     void on_refreshPushButton_clicked();
     void on_deployPushButton_clicked();
+    void on_savePushButton_clicked();
     void on_tabWidget_clicked(int index);
     void setTodayReport();
     void showMonth();
+    void setModelDay();
 };
 
 struct WorkDeploy {

@@ -20,9 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     readDataFile();
     //dateEdit의 날짜를 바꾸면
     connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::setTodayReport);
+
     // QDate 초기값을 오늘 날짜로 설정
     ui->dateEdit->setDate(QDate::currentDate());
-
+    //
+    connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::setModelDay);
     // 설정 탭
     worktype = new WorkTypeSettings();
     ui->tabWidget->insertTab(0, worktype, "설정");
@@ -131,6 +133,14 @@ void MainWindow::on_deployPushButton_clicked()
        // qDebug() <<"get next work =>" << getNextWorktype(deploy.name, work_type.first);
     }
 
+}
+
+void MainWindow::on_savePushButton_clicked()
+{
+
+    //ui->tableView->co
+    qDebug() << "on save " << month_model.headerData(2, Qt::Horizontal);
+    month_model.submit();
 }
 
 void MainWindow::on_tabWidget_clicked(int index)
@@ -371,6 +381,13 @@ void MainWindow::showMonth()
 
 
     ui->tableView->setModel(&month_model);
+
+}
+
+void MainWindow::setModelDay()
+{
+    qDebug() << "in set Model day";
+    month_model.setDay(ui->dateEdit->date());
 
 }
 

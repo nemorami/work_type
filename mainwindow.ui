@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="month_tab">
      <attribute name="title">
@@ -36,7 +36,7 @@
         <x>10</x>
         <y>10</y>
         <width>160</width>
-        <height>89</height>
+        <height>100</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="monthVerticalLayout">
@@ -47,6 +47,13 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="savePushButton">
+         <property name="text">
+          <string>&amp;Save</string>
          </property>
         </widget>
        </item>
