@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="month_tab">
      <attribute name="title">
@@ -36,7 +36,7 @@
         <x>10</x>
         <y>10</y>
         <width>160</width>
-        <height>100</height>
+        <height>118</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="monthVerticalLayout">
@@ -188,6 +188,9 @@
           <layout class="QVBoxLayout" name="partVerticalLayout">
            <item>
             <widget class="QLabel" name="label_13">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(136, 136, 136);</string>
+             </property>
              <property name="text">
               <string>구분</string>
              </property>
@@ -252,7 +255,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

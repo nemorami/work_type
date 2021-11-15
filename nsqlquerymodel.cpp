@@ -17,9 +17,9 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
     QString name;
     QString work;
-    qDebug() << "month model save " << day;
+   // qDebug() << "month model save " << day;
 
-    day += index.column();
+   // day += index.column();
 
     if (index.isValid() && role == Qt::EditRole) {
         QSqlQuery query;

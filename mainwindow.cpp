@@ -18,18 +18,26 @@ MainWindow::MainWindow(QWidget *parent)
    // ui->dockWidgetContents->setLayout(ui->verticalLayout);
     //connect(ui->pushButton, &QPushButton::clicked, this, );
     readDataFile();
+    ui->dateEdit->setDate(QDate(2020,11,9));
     //dateEdit의 날짜를 바꾸면
     connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::setTodayReport);
 
     // QDate 초기값을 오늘 날짜로 설정
-    ui->dateEdit->setDate(QDate::currentDate());
+
     //
     connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::setModelDay);
     // 설정 탭
+    // on_tabWidget_currentChanged로 대체..
+    //connect(&ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::tabChanged);
     worktype = new WorkTypeSettings();
     ui->tabWidget->insertTab(0, worktype, "설정");
     ui->month_tab->setLayout(ui->monthVerticalLayout);
     ui->daily_tab->setLayout(ui->todayVerticalLayout);
+    //일일근무 탭을 보여준다.
+    ui->tabWidget->setCurrentIndex(2);
+    setTodayReport();
+
+
 
 
 
@@ -102,7 +110,7 @@ void MainWindow::on_deployPushButton_clicked()
         auto work_type = getLastWorktype(deploy.name);
         auto w = work_type.first;
         date = work_type.second;
-        qDebug() << "return getLastWorktype=>" << date;
+        //qDebug() << "return getLastWorktype=>" << date;
         QDate today = ui->dateEdit->date();
 
         if(date.year() == 1970) {
@@ -115,7 +123,7 @@ void MainWindow::on_deployPushButton_clicked()
             query.exec();
 
         }
-        qDebug() << "date => " << date;
+        //qDebug() << "date => " << date;
         for(date= date.addDays(1); date <= QDate(today.year(),today.month(), today.daysInMonth());date = date.addDays(1)) {
             w = getNextWorktype(deploy.name, w);
             query.prepare("insert into daily values(:day, :name, :work)");
@@ -139,11 +147,11 @@ void MainWindow::on_savePushButton_clicked()
 {
 
     //ui->tableView->co
-    qDebug() << "on save " << month_model.headerData(2, Qt::Horizontal);
+    //qDebug() << "on save " << month_model.headerData(2, Qt::Horizontal);
     month_model.submit();
 }
 
-void MainWindow::on_tabWidget_clicked(int index)
+void MainWindow::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
     case 1:
@@ -263,6 +271,8 @@ void MainWindow::setTodayReport()
 
 
     for (auto &l :{ui->partVerticalLayout, ui->normalVerticalLayout, ui->homeVerticalLayout, ui->allVerticalLayout, ui->offVerticalLayout} ) {
+       if(l->count() <= 1)
+           break;
         QLayoutItem *item;
         while ((item = l->takeAt(1)) != nullptr) {
             //Q_ASSERT(!item->layout());
