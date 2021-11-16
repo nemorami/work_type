@@ -31,6 +31,8 @@ private:
     WorkTypeSettings *worktype;
     QSqlDatabase db;
     NSqlQueryModel month_model;
+    QSqlQueryModel daily_model;
+    QSqlQueryModel daily_name_model;
 
     QVector<QLabel *> lbnPart;
     QVector<QLabel *> lbnNormal;
@@ -43,8 +45,9 @@ private slots:
     void on_deployPushButton_clicked();
     void on_savePushButton_clicked();
     void on_tabWidget_currentChanged(int index);
-    void setTodayReport();
+//    void setTodayReport();
     void showMonth();
+    void showDaily();
     void setModelDay();
 };
 
