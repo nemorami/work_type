@@ -12,7 +12,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
     void setDay(QDate date);
 private:
-    QString day;
+    QDate day;
 
 };
 

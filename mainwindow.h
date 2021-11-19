@@ -49,6 +49,8 @@ private slots:
     void showMonth();
     void showDaily();
     void setModelDay();
+    void clearMonthView();
+    void customMenuRequested(QPoint);
 };
 
 struct WorkDeploy {

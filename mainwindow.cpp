@@ -18,14 +18,14 @@ MainWindow::MainWindow(QWidget *parent)
    // ui->dockWidgetContents->setLayout(ui->verticalLayout);
     //connect(ui->pushButton, &QPushButton::clicked, this, );
     readDataFile();
-    ui->dateEdit->setDate(QDate(2020,11,9));
+    ui->dateEdit->setDate(QDate::currentDate());
     //dateEdit의 날짜를 바꾸면
 //    connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::setTodayReport);
     connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::showDaily);
     // QDate 초기값을 오늘 날짜로 설정
 
-    //
-    connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::setModelDay);
+    // ᅟshowDaily에서 호출
+    //connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::setModelDay);
     // 설정 탭
     // on_tabWidget_currentChanged로 대체..
     //connect(&ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::tabChanged);
@@ -43,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->dailyTableView->verticalHeader()->height();
     //setTodayReport();
 
-
-
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, &QTableView::customContextMenuRequested, this, &MainWindow::customMenuRequested);
+    connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::showMonth);
 
 
 
@@ -231,7 +232,7 @@ QPair<QString, QDate> MainWindow::getLastWorktype(QString name)
 
 void MainWindow::on_refreshPushButton_clicked()
 {
-    //showMonth();
+    showMonth();
     showDaily();
 }
 
@@ -401,13 +402,33 @@ void MainWindow::showMonth()
 
 }
 
+void MainWindow::clearMonthView()
+{
+
+   for(auto index: ui->tableView->selectionModel()->selectedIndexes()){
+       qDebug() << index;
+   }
+}
+
+void MainWindow::customMenuRequested(QPoint pos)
+{
+    QModelIndex index = ui->tableView->indexAt(pos);
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction(tr("Clear"), [this](){this->clearMonthView();});
+
+    menu->popup(ui->tableView->viewport()->mapToGlobal(pos));
+
+}
+
 void MainWindow::showDaily()
 {
+    setModelDay();
     QString daily = QString("select count(*) 현원,\
             sum(case when substr(work, 1,1) in('전', '주', '보') then 1 end) 근무,\
             sum(case when substr(work, 1,1) = '비' then 1 end) 비번,\
             sum(case when substr(work, 1,1) = '전' then 1 end) 전일, \
-            sum(case when substr(work, 1,1) = '연' then 1 end) 연가\
+            sum(case when substr(work, 1,1) = '휴' then 1 end) 휴가\
             from daily where day = '%1'").arg(ui->dateEdit->date().toString("yyyy-MM-dd"));
     daily_model.setQuery(daily);
     ui->dailyTableView->setModel(&daily_model);

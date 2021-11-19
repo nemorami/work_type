@@ -1,6 +1,7 @@
 #include "nsqlquerymodel.h"
 #include <QSqlQuery>
 #include <QDebug>
+#include <QSqlError>
 NSqlQueryModel::NSqlQueryModel(QObject *parent) : QSqlQueryModel(parent)
 {
 
@@ -16,20 +17,26 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 {
 
     QString name;
-    QString work;
-   // qDebug() << "month model save " << day;
 
-   // day += index.column();
+    //QString work;
+   // qDebug() << "month model save " << day;
+    //컬럼이이 1이하 즉 계이거나 이름이면 수정하지 않는다.
+    if (index.column()<=1)
+        return false;
+
+    day = QDate(day.year(), day.month(), index.column()-1);
+    name = this->data(index.model()->index(index.row(), 1)).toString();
 
     if (index.isValid() && role == Qt::EditRole) {
         QSqlQuery query;
         query.prepare("update daily set work = :work where day = :day and name = :name");
-        query.bindValue(":work", work);
+        query.bindValue(":work", value.toString());
         query.bindValue(":name", name);
         query.bindValue(":day", day);
         if(!query.exec())
             return false;
         setQuery(query.lastQuery());
+        emit dataChanged(index,index);
         return true;
     }
     return false;
@@ -38,6 +45,6 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 void NSqlQueryModel::setDay(QDate date)
 {
-    day = date.toString("yyyy-MM-dd");
+    day = date;
 
 }
