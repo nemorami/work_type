@@ -13,6 +13,8 @@ public:
     void setDay(QDate date);
 private:
     QDate day;
+public slots:
+    bool clearMonth(QDate date);
 
 };
 

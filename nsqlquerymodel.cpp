@@ -29,10 +29,11 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
     if (index.isValid() && role == Qt::EditRole) {
         QSqlQuery query;
-        query.prepare("update daily set work = :work where day = :day and name = :name");
+        query.prepare("insert into daily(day, name, work) values(:day, :name, :work) on conflict(day, name) do update set work = :work");
         query.bindValue(":work", value.toString());
         query.bindValue(":name", name);
         query.bindValue(":day", day);
+
         if(!query.exec())
             return false;
         setQuery(query.lastQuery());
@@ -45,6 +46,22 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 void NSqlQueryModel::setDay(QDate date)
 {
-    day = date;
+    day = date;    
+
+}
+
+bool NSqlQueryModel::clearMonth(QDate date)
+{
+    QSqlQuery query;
+    query.prepare(QString("delete from daily where day like '%1-%2%'").arg(date.year()).arg(date.month()));
+
+
+    if(!query.exec())
+        qDebug() << query.lastError() << query.lastQuery();
+        return false;
+    setQuery(query.lastQuery());
+
+    //emit dataChanged();
+    return true;
 
 }

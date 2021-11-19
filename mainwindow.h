@@ -44,6 +44,7 @@ private slots:
     void on_refreshPushButton_clicked();
     void on_deployPushButton_clicked();
     void on_savePushButton_clicked();
+    void on_clearPushButton_clicked();
     void on_tabWidget_currentChanged(int index);
 //    void setTodayReport();
     void showMonth();

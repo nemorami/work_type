@@ -35,8 +35,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>160</width>
-        <height>118</height>
+        <width>170</width>
+        <height>136</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="monthVerticalLayout">
@@ -51,11 +51,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="savePushButton">
-         <property name="text">
-          <string>&amp;Save</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="clearPushButton">
+           <property name="text">
+            <string>&amp;Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="savePushButton">
+           <property name="text">
+            <string>&amp;Save</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

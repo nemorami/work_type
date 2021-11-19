@@ -81,7 +81,7 @@ void MainWindow::readDataFile()
             query.prepare("create table work_type(name text, part text, work_patterns text)");
             query.exec();
             //테이블을 생성 day 날짜, 이름 이름, work 근무형태를 나타내는 한글자와 숫자로 구성 전일 비번 비번 주간 일때 전1 비1 비2 주1이 입력됨
-            query.prepare("create table daily(day text, name text, work text)");
+            query.prepare("create table daily(day text, name text, work text, primary key(day, name))");
             query.exec();
         }
 
@@ -157,6 +157,13 @@ void MainWindow::on_savePushButton_clicked()
     //qDebug() << "on save " << month_model.headerData(2, Qt::Horizontal);
     month_model.submit();
 }
+
+void MainWindow::on_clearPushButton_clicked()
+{
+    clearMonthView();
+}
+
+
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
@@ -392,8 +399,8 @@ void MainWindow::showMonth()
                             max(case when day = '29' then work end) '29',\
                             max(case when day = '30' then work end) '30',\
                             max(case when day = '31' then work end) '31'\
-                     from (select substr(day, 9, 2) as day, part, name, work from daily join work_type using(name) where substr(day, 6, 2) = '%1')\
-                     group by 1, 2").arg(ui->dateEdit->date().month());
+                     from work_type left join (select substr(day, 9, 2) as day, name, work from daily where substr(day, 1, 7) = '%1-%2') using(name) \
+                     group by 1, 2").arg(ui->dateEdit->date().year()).arg(ui->dateEdit->date().month());
     month_model.setQuery(query);
 
 
@@ -405,9 +412,8 @@ void MainWindow::showMonth()
 void MainWindow::clearMonthView()
 {
 
-   for(auto index: ui->tableView->selectionModel()->selectedIndexes()){
-       qDebug() << index;
-   }
+  month_model.clearMonth(ui->dateEdit->date());
+  showMonth();
 }
 
 void MainWindow::customMenuRequested(QPoint pos)
