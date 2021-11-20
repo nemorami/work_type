@@ -18,7 +18,8 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
     QString name;
 
-    //QString work;
+
+    QString work;
    // qDebug() << "month model save " << day;
     //컬럼이이 1이하 즉 계이거나 이름이면 수정하지 않는다.
     if (index.column()<=1)
@@ -26,11 +27,16 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
 
     day = QDate(day.year(), day.month(), index.column()-1);
     name = this->data(index.model()->index(index.row(), 1)).toString();
+    work = value.toString();
+
+    // work가 2자가 아니거나 전비주보휴로 시작하지 않으면 입력하지 않는다.
+    if(work.size() != 2 or !QString("전비주보휴").contains(work[0]))
+        return false;
 
     if (index.isValid() && role == Qt::EditRole) {
         QSqlQuery query;
         query.prepare("insert into daily(day, name, work) values(:day, :name, :work) on conflict(day, name) do update set work = :work");
-        query.bindValue(":work", value.toString());
+        query.bindValue(":work", work);
         query.bindValue(":name", name);
         query.bindValue(":day", day);
 

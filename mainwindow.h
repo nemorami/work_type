@@ -22,7 +22,7 @@ public:
     ~MainWindow();
     void readDataFile();
 
-    QString getNextWorktype(QString name, QString init_work);
+    QString getNextWorktype(QString part, QString init_work);
     QPair<QString, QDate> getLastWorktype(QString name);
 
 
@@ -34,11 +34,6 @@ private:
     QSqlQueryModel daily_model;
     QSqlQueryModel daily_name_model;
 
-    QVector<QLabel *> lbnPart;
-    QVector<QLabel *> lbnNormal;
-    QVector<QLabel *> lbnHome;
-    QVector<QLabel *> lbnAll;
-    QVector<QLabel *> lbnOff;
 
 private slots:
     void on_refreshPushButton_clicked();
@@ -51,6 +46,7 @@ private slots:
     void showDaily();
     void setModelDay();
     void clearMonthView();
+    void copyToClipboard();
     void customMenuRequested(QPoint);
 };
 

@@ -3,9 +3,10 @@
 #include <QDebug>
 #include <QtCore/QStandardPaths>
 #include <QDir>
-#include <mainwindow.h>
+//#include <mainwindow.h>
 #include <QtSql/QSqlQuery>
 #include <QSqlError>
+#include <QClipboard>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->dateEdit->setDate(QDate::currentDate());
     //dateEdit의 날짜를 바꾸면
 //    connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::setTodayReport);
-    connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::showDaily);
+    connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::on_refreshPushButton_clicked);
     // QDate 초기값을 오늘 날짜로 설정
 
     // ᅟshowDaily에서 호출
@@ -47,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &MainWindow::customMenuRequested);
     connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::showMonth);
 
+    ui->dailyTableView2->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    ui->dailyTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->dailyTableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->dailyTableView2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
 
 
 
@@ -57,19 +64,35 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::readDataFile()
 {
     //database connection
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    //db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QPSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("rpa");
+    db.setPassword("rpa");
+    db.setUserName("rpa");
     QString data_dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     // 데이터 디렉토리가 없으면  생성
     if (!QDir(data_dir).exists())
         QDir().mkdir(data_dir);
 
-    db.setDatabaseName(data_dir + "/work_db");
+    //db.setDatabaseName(data_dir + "/work_db");
     //qDebug() << data_dir;
-    db.open();
+    if(!db.open()) {
+        qDebug() << db.lastError();
+        return;
+    }
+
+    /* TODO
+     *
+     *
+     */
+
 
     QSqlQuery query;
     //sqlite_master
+    //TODO postgresql에서 테이블이 있는지 확인
     query.prepare("select count(*) from sqlite_master where name = 'work_type'");
+    //qDebug() << query.lastError();
     query.exec();
 
     if(query.next()) {
@@ -120,33 +143,30 @@ void MainWindow::on_deployPushButton_clicked()
         //qDebug() << "return getLastWorktype=>" << date;
         QDate today = ui->dateEdit->date();
 
-        if(date.year() == 1970) {
-            date = QDate(today.year(), today.month(), 1);
-
+        auto insert = [&query](QDate &date, QString &name, QString &work){
             query.prepare("insert into daily values(:day, :name, :work)");
             query.bindValue(":day", date);
-            query.bindValue(":name", deploy.name);
-            query.bindValue(":work", w);
+            query.bindValue(":name", name);
+            query.bindValue(":work", work);
             query.exec();
+        };
+
+        if(w == nullptr) {
+            date = QDate(today.year(), today.month(), 1);
+            w = QString("%1%2").arg(deploy.work[0]).arg(1);
+            insert(date, deploy.name, w);
 
         }
         //qDebug() << "date => " << date;
-        for(date= date.addDays(1); date <= QDate(today.year(),today.month(), today.daysInMonth());date = date.addDays(1)) {
-            w = getNextWorktype(deploy.name, w);
-            query.prepare("insert into daily values(:day, :name, :work)");
-            query.bindValue(":day", date);
-            query.bindValue(":name", deploy.name);
-            query.bindValue(":work", w);
-            query.exec();
-
-        }
-
-
-
-    //        ";
-
-       // qDebug() <<"get next work =>" << getNextWorktype(deploy.name, work_type.first);
+        for(date = date.addDays(1); date <= QDate(today.year(),today.month(), today.daysInMonth());date = date.addDays(1)) {
+            w = getNextWorktype(deploy.work, w);
+            insert(date, deploy.name, w);
+        }   
     }
+
+    showMonth();
+    showDaily();
+
 
 }
 
@@ -178,36 +198,41 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 }
 
 
-QString MainWindow::getNextWorktype(QString name, QString init_work)
+QString MainWindow::getNextWorktype(QString part, QString init_work)
 {
-    QSqlQuery query;
+//    QSqlQuery query;
 
-    query.prepare("select work_patterns from work_type where name = :name");
-    query.bindValue(":name", name);
-    query.exec();
+//    query.prepare("select work_patterns from work_type where name = :name");
+//    query.bindValue(":name", name);
+//    query.exec();
 
-    query.next();
+//    query.next();
 
-    QString work_list = query.value(0).toString();
+    //QString work_list = query.value(0).toString();
     // init_work를 work와 index로 분리 ex) 주2: work => 주, index => 2
     QChar work = init_work[0];
     int index = init_work.remove(0,1).toInt();
     // 다음 근무일 위치를 구한다.
-    int search = work_list.indexOf(work);
-    search = search + index;
-    if(search >= work_list.size())
+    int search = 0;
+    //index번째 work의 위치를 찾는다.
+    while(index--){
+        search = part.indexOf(work, search);
+        search++;
+    }
+
+    if(search >= part.size())
         search = 0;
-    // 다음일 근무도 형태가 갈으면 인덱스를 증가, 아니면 ...
-    //qDebug() << "work=> " << work << "work_list[search]=> " << work_list[search] << "search=> " << search << "\n";
-    if (work == work_list[search])
-        index++;
-    else
-        index = 1;
-    //qDebug() << "work list=> " << work_list << "search => " << search << "work => " << work << "\n";
-    return QString("%1%2").arg(work_list[search]).arg(index);
+    work = part[search];
+    index = part.left(search+1).count(work);
+    return QString("%1%2").arg(part[search]).arg(index);
 
 }
-
+/**
+ * @brief MainWindow::getLastWorktype
+ * @param name
+ * @return
+ * 마지막 Work type이 없으면 nulltype리턴....
+ */
 QPair<QString, QDate> MainWindow::getLastWorktype(QString name)
 {
     QSqlQuery query;
@@ -223,6 +248,7 @@ QPair<QString, QDate> MainWindow::getLastWorktype(QString name)
         if(QString("주전비보").contains(work[0]))
                 break;
     }
+    /*
     if(work == nullptr) {
         query.prepare("select work_patterns from work_type where name = :name");
         query.bindValue(":name", name);
@@ -233,6 +259,7 @@ QPair<QString, QDate> MainWindow::getLastWorktype(QString name)
         date = QDate(1970,1,1);//ui->dateEdit->date().addDays(-ui->dateEdit->date().day());
 
     }
+    */
 
     return QPair<QString, QDate>(work, date);
 }
@@ -367,43 +394,43 @@ void MainWindow::on_refreshPushButton_clicked()
 void MainWindow::showMonth()
 {
     // 한달 근무 배치표 탭 만들기
-    QString query = QString("select part '계', name '이름',\
-                            max(case when day = '01' then work end) '01',\
-                            max(case when day = '02' then work end) '02',\
-                            max(case when day = '03' then work end) '03',\
-                            max(case when day = '04' then work end) '04',\
-                            max(case when day = '05' then work end) '05',\
-                            max(case when day = '06' then work end) '06',\
-                            max(case when day = '07' then work end) '07',\
-                            max(case when day = '08' then work end) '08',\
-                            max(case when day = '09' then work end) '09',\
-                            max(case when day = '10' then work end) '10',\
-                            max(case when day = '11' then work end) '11',\
-                            max(case when day = '12' then work end) '12',\
-                            max(case when day = '13' then work end) '13',\
-                            max(case when day = '14' then work end) '14',\
-                            max(case when day = '15' then work end) '15',\
-                            max(case when day = '16' then work end) '16',\
-                            max(case when day = '17' then work end) '17',\
-                            max(case when day = '18' then work end) '18',\
-                            max(case when day = '19' then work end) '19',\
-                            max(case when day = '20' then work end) '20',\
-                            max(case when day = '21' then work end) '21',\
-                            max(case when day = '22' then work end) '22',\
-                            max(case when day = '23' then work end) '23',\
-                            max(case when day = '24' then work end) '24',\
-                            max(case when day = '25' then work end) '25',\
-                            max(case when day = '26' then work end) '26',\
-                            max(case when day = '27' then work end) '27',\
-                            max(case when day = '28' then work end) '28',\
-                            max(case when day = '29' then work end) '29',\
-                            max(case when day = '30' then work end) '30',\
-                            max(case when day = '31' then work end) '31'\
-                     from work_type left join (select substr(day, 9, 2) as day, name, work from daily where substr(day, 1, 7) = '%1-%2') using(name) \
-                     group by 1, 2").arg(ui->dateEdit->date().year()).arg(ui->dateEdit->date().month());
+    QString query = QString("select part \"계\", name \"이름\",\
+                            max(case when day = '01' then work end) \"01\",\
+                            max(case when day = '02' then work end) \"02\",\
+                            max(case when day = '03' then work end) \"03\",\
+                            max(case when day = '04' then work end) \"04\",\
+                            max(case when day = '05' then work end) \"05\",\
+                            max(case when day = '06' then work end) \"06\",\
+                            max(case when day = '07' then work end) \"07\",\
+                            max(case when day = '08' then work end) \"08\",\
+                            max(case when day = '09' then work end) \"09\",\
+                            max(case when day = '10' then work end) \"10\",\
+                            max(case when day = '11' then work end) \"11\",\
+                            max(case when day = '12' then work end) \"12\",\
+                            max(case when day = '13' then work end) \"13\",\
+                            max(case when day = '14' then work end) \"14\",\
+                            max(case when day = '15' then work end) \"15\",\
+                            max(case when day = '16' then work end) \"16\",\
+                            max(case when day = '17' then work end) \"17\",\
+                            max(case when day = '18' then work end) \"18\",\
+                            max(case when day = '19' then work end) \"19\",\
+                            max(case when day = '20' then work end) \"20\",\
+                            max(case when day = '21' then work end) \"21\",\
+                            max(case when day = '22' then work end) \"22\",\
+                            max(case when day = '23' then work end) \"23\",\
+                            max(case when day = '24' then work end) \"24\",\
+                            max(case when day = '25' then work end) \"25\",\
+                            max(case when day = '26' then work end) \"26\",\
+                            max(case when day = '27' then work end) \"27\",\
+                            max(case when day = '28' then work end) \"28\",\
+                            max(case when day = '29' then work end) \"29\",\
+                            max(case when day = '30' then work end) \"30\",\
+                            max(case when day = '31' then work end) \"31\"\
+                     from work_type left join (select substr(day, 9, 2) as day, name, work from daily where substr(day, 1, 7) = '%1-%2') ta using(name) \
+                     group by 1, 2 order by 1, 2").arg(ui->dateEdit->date().year()).arg(ui->dateEdit->date().month());
     month_model.setQuery(query);
 
-
+    //qDebug() << month_model.lastError();
 
     ui->tableView->setModel(&month_model);
 
@@ -416,11 +443,31 @@ void MainWindow::clearMonthView()
   showMonth();
 }
 
+void MainWindow::copyToClipboard()
+{
+    QString selected_text;
+    auto indexes = ui->tableView->selectionModel()->selectedIndexes();
+    auto previous = indexes.first();
+
+    for (auto index : indexes) {
+        auto data = ui->tableView->model()->data(index).toString();
+        if(index.row() != previous.row())
+            selected_text.append('\n');
+        else
+            selected_text.append('\t');
+        selected_text.append(data);
+        previous = index;
+    }
+    selected_text.remove(0,1);
+    qApp->clipboard()->setText(selected_text);
+}
+
 void MainWindow::customMenuRequested(QPoint pos)
 {
     QModelIndex index = ui->tableView->indexAt(pos);
     QMenu *menu = new QMenu(this);
 
+    menu->addAction(tr("&Copy"), [this](){this->copyToClipboard();});
     menu->addAction(tr("Clear"), [this](){this->clearMonthView();});
 
     menu->popup(ui->tableView->viewport()->mapToGlobal(pos));
@@ -439,12 +486,16 @@ void MainWindow::showDaily()
     daily_model.setQuery(daily);
     ui->dailyTableView->setModel(&daily_model);
 
-   QString daily_name = QString("select part 구분, case when work = '주' then d.name end 주간,\
-                                case when work = '전' then d.name end 전일,\
-                                case when work = '비' then d.name end 비번\
-                         from (select name, substr(work, 1, 1) work from daily where day = '%1') d\
-                                  join work_type wt on d.name = wt.name").arg(ui->dateEdit->date().toString("yyyy-MM-dd"));
+   QString daily_name = QString("select part \"구분\", \
+                                        string_agg(case when work = '주' then d.name end, ', ') \"주간\",\
+                                        string_agg(case when work = '전' then d.name end, ', ') \"전일\",\
+                                        string_agg(case when work = '비' then d.name end, ', ') \"비번\", \
+                                        string_agg(case when work = '휴' then d.name end, ', ') \"휴가\" \
+                                  from (select name, substr(work, 1, 1) \"work\" from daily where day = '%1') d \
+                                   join work_type wt on d.name = wt.name \
+                                  group by 1").arg(ui->dateEdit->date().toString("yyyy-MM-dd"));
    daily_name_model.setQuery(daily_name);
+   qDebug() << daily_name_model.lastError();
    ui->dailyTableView2->setModel(&daily_name_model);
 
 }

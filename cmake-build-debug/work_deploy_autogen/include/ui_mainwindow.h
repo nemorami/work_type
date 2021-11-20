@@ -15,7 +15,6 @@
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -36,40 +35,14 @@ public:
     QWidget *verticalLayoutWidget;
     QVBoxLayout *monthVerticalLayout;
     QTableView *tableView;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *clearPushButton;
     QPushButton *savePushButton;
     QWidget *daily_tab;
     QWidget *verticalLayoutWidget_2;
     QVBoxLayout *todayVerticalLayout;
     QTableView *dailyTableView;
-    QHBoxLayout *horizontalLayout;
-    QVBoxLayout *verticalLayout_4;
-    QLabel *label_2;
-    QLabel *lbFix;
-    QVBoxLayout *verticalLayout_6;
-    QLabel *label_5;
-    QLabel *lbCurrent;
-    QLabel *label_7;
-    QLabel *lbAll;
-    QVBoxLayout *verticalLayout_7;
-    QLabel *label_9;
-    QLabel *lbOff;
-    QVBoxLayout *verticalLayout_9;
-    QLabel *label_11;
-    QLabel *lbVacation;
-    QVBoxLayout *verticalLayout_5;
-    QLabel *label_4;
-    QLabel *label_3;
-    QHBoxLayout *horizontalLayout_2;
-    QVBoxLayout *partVerticalLayout;
-    QLabel *label_13;
-    QVBoxLayout *normalVerticalLayout;
-    QLabel *label_17;
-    QVBoxLayout *homeVerticalLayout;
-    QLabel *label_14;
-    QVBoxLayout *allVerticalLayout;
-    QLabel *label_15;
-    QVBoxLayout *offVerticalLayout;
-    QLabel *label_16;
+    QTableView *dailyTableView2;
     QMenuBar *menubar;
     QStatusBar *statusbar;
     QDockWidget *dockWidget;
@@ -94,7 +67,7 @@ public:
         month_tab->setObjectName(QString::fromUtf8("month_tab"));
         verticalLayoutWidget = new QWidget(month_tab);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 10, 160, 118));
+        verticalLayoutWidget->setGeometry(QRect(10, 10, 170, 136));
         monthVerticalLayout = new QVBoxLayout(verticalLayoutWidget);
         monthVerticalLayout->setObjectName(QString::fromUtf8("monthVerticalLayout"));
         monthVerticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -108,176 +81,56 @@ public:
 
         monthVerticalLayout->addWidget(tableView);
 
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        clearPushButton = new QPushButton(verticalLayoutWidget);
+        clearPushButton->setObjectName(QString::fromUtf8("clearPushButton"));
+
+        horizontalLayout_2->addWidget(clearPushButton);
+
         savePushButton = new QPushButton(verticalLayoutWidget);
         savePushButton->setObjectName(QString::fromUtf8("savePushButton"));
 
-        monthVerticalLayout->addWidget(savePushButton);
+        horizontalLayout_2->addWidget(savePushButton);
+
+
+        monthVerticalLayout->addLayout(horizontalLayout_2);
 
         tabWidget->addTab(month_tab, QString());
         daily_tab = new QWidget();
         daily_tab->setObjectName(QString::fromUtf8("daily_tab"));
         verticalLayoutWidget_2 = new QWidget(daily_tab);
         verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(10, 10, 551, 251));
+        verticalLayoutWidget_2->setGeometry(QRect(10, 10, 551, 302));
         todayVerticalLayout = new QVBoxLayout(verticalLayoutWidget_2);
         todayVerticalLayout->setObjectName(QString::fromUtf8("todayVerticalLayout"));
         todayVerticalLayout->setContentsMargins(0, 0, 0, 0);
         dailyTableView = new QTableView(verticalLayoutWidget_2);
         dailyTableView->setObjectName(QString::fromUtf8("dailyTableView"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(dailyTableView->sizePolicy().hasHeightForWidth());
+        dailyTableView->setSizePolicy(sizePolicy1);
 
         todayVerticalLayout->addWidget(dailyTableView);
 
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        verticalLayout_4 = new QVBoxLayout();
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        label_2 = new QLabel(verticalLayoutWidget_2);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        dailyTableView2 = new QTableView(verticalLayoutWidget_2);
+        dailyTableView2->setObjectName(QString::fromUtf8("dailyTableView2"));
+        QFont font;
+        font.setPointSize(16);
+        font.setBold(false);
+        font.setItalic(false);
+        dailyTableView2->setFont(font);
+        dailyTableView2->setStyleSheet(QString::fromUtf8("font: 25 16pt ;"));
 
-        verticalLayout_4->addWidget(label_2);
-
-        lbFix = new QLabel(verticalLayoutWidget_2);
-        lbFix->setObjectName(QString::fromUtf8("lbFix"));
-
-        verticalLayout_4->addWidget(lbFix);
-
-
-        horizontalLayout->addLayout(verticalLayout_4);
-
-        verticalLayout_6 = new QVBoxLayout();
-        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
-        label_5 = new QLabel(verticalLayoutWidget_2);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
-
-        verticalLayout_6->addWidget(label_5);
-
-        lbCurrent = new QLabel(verticalLayoutWidget_2);
-        lbCurrent->setObjectName(QString::fromUtf8("lbCurrent"));
-
-        verticalLayout_6->addWidget(lbCurrent);
-
-        label_7 = new QLabel(verticalLayoutWidget_2);
-        label_7->setObjectName(QString::fromUtf8("label_7"));
-
-        verticalLayout_6->addWidget(label_7);
-
-        lbAll = new QLabel(verticalLayoutWidget_2);
-        lbAll->setObjectName(QString::fromUtf8("lbAll"));
-
-        verticalLayout_6->addWidget(lbAll);
-
-
-        horizontalLayout->addLayout(verticalLayout_6);
-
-        verticalLayout_7 = new QVBoxLayout();
-        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
-        label_9 = new QLabel(verticalLayoutWidget_2);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
-
-        verticalLayout_7->addWidget(label_9);
-
-        lbOff = new QLabel(verticalLayoutWidget_2);
-        lbOff->setObjectName(QString::fromUtf8("lbOff"));
-
-        verticalLayout_7->addWidget(lbOff);
-
-
-        horizontalLayout->addLayout(verticalLayout_7);
-
-        verticalLayout_9 = new QVBoxLayout();
-        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
-        label_11 = new QLabel(verticalLayoutWidget_2);
-        label_11->setObjectName(QString::fromUtf8("label_11"));
-
-        verticalLayout_9->addWidget(label_11);
-
-        lbVacation = new QLabel(verticalLayoutWidget_2);
-        lbVacation->setObjectName(QString::fromUtf8("lbVacation"));
-
-        verticalLayout_9->addWidget(lbVacation);
-
-
-        horizontalLayout->addLayout(verticalLayout_9);
-
-        verticalLayout_5 = new QVBoxLayout();
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
-        label_4 = new QLabel(verticalLayoutWidget_2);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
-
-        verticalLayout_5->addWidget(label_4);
-
-        label_3 = new QLabel(verticalLayoutWidget_2);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        verticalLayout_5->addWidget(label_3);
-
-
-        horizontalLayout->addLayout(verticalLayout_5);
-
-
-        todayVerticalLayout->addLayout(horizontalLayout);
-
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        partVerticalLayout = new QVBoxLayout();
-        partVerticalLayout->setObjectName(QString::fromUtf8("partVerticalLayout"));
-        label_13 = new QLabel(verticalLayoutWidget_2);
-        label_13->setObjectName(QString::fromUtf8("label_13"));
-        label_13->setStyleSheet(QString::fromUtf8("background-color: rgb(136, 136, 136);"));
-
-        partVerticalLayout->addWidget(label_13);
-
-
-        horizontalLayout_2->addLayout(partVerticalLayout);
-
-        normalVerticalLayout = new QVBoxLayout();
-        normalVerticalLayout->setObjectName(QString::fromUtf8("normalVerticalLayout"));
-        label_17 = new QLabel(verticalLayoutWidget_2);
-        label_17->setObjectName(QString::fromUtf8("label_17"));
-
-        normalVerticalLayout->addWidget(label_17);
-
-
-        horizontalLayout_2->addLayout(normalVerticalLayout);
-
-        homeVerticalLayout = new QVBoxLayout();
-        homeVerticalLayout->setObjectName(QString::fromUtf8("homeVerticalLayout"));
-        label_14 = new QLabel(verticalLayoutWidget_2);
-        label_14->setObjectName(QString::fromUtf8("label_14"));
-
-        homeVerticalLayout->addWidget(label_14);
-
-
-        horizontalLayout_2->addLayout(homeVerticalLayout);
-
-        allVerticalLayout = new QVBoxLayout();
-        allVerticalLayout->setObjectName(QString::fromUtf8("allVerticalLayout"));
-        label_15 = new QLabel(verticalLayoutWidget_2);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
-
-        allVerticalLayout->addWidget(label_15);
-
-
-        horizontalLayout_2->addLayout(allVerticalLayout);
-
-        offVerticalLayout = new QVBoxLayout();
-        offVerticalLayout->setObjectName(QString::fromUtf8("offVerticalLayout"));
-        label_16 = new QLabel(verticalLayoutWidget_2);
-        label_16->setObjectName(QString::fromUtf8("label_16"));
-
-        offVerticalLayout->addWidget(label_16);
-
-
-        horizontalLayout_2->addLayout(offVerticalLayout);
-
-
-        todayVerticalLayout->addLayout(horizontalLayout_2);
+        todayVerticalLayout->addWidget(dailyTableView2);
 
         tabWidget->addTab(daily_tab, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 25));
+        menubar->setGeometry(QRect(0, 0, 800, 19));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -322,26 +175,10 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "WORK DEPLOY -- R&D and Equipment Division", nullptr));
+        clearPushButton->setText(QCoreApplication::translate("MainWindow", "&Clear", nullptr));
         savePushButton->setText(QCoreApplication::translate("MainWindow", "&Save", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(month_tab), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
-        label_2->setText(QCoreApplication::translate("MainWindow", "\355\230\204\354\233\220", nullptr));
-        lbFix->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_5->setText(QCoreApplication::translate("MainWindow", "\354\264\235\352\267\274\353\254\264\354\235\270\354\233\220", nullptr));
-        lbCurrent->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_7->setText(QCoreApplication::translate("MainWindow", "\354\240\204\354\235\274", nullptr));
-        lbAll->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_9->setText(QCoreApplication::translate("MainWindow", "\353\271\204\353\262\210", nullptr));
-        lbOff->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_11->setText(QCoreApplication::translate("MainWindow", "\355\234\264\353\254\264", nullptr));
-        lbVacation->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_4->setText(QCoreApplication::translate("MainWindow", "\352\270\260\355\203\200", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        label_13->setText(QCoreApplication::translate("MainWindow", "\352\265\254\353\266\204", nullptr));
-        label_17->setText(QCoreApplication::translate("MainWindow", "\354\243\274\352\260\204", nullptr));
-        label_14->setText(QCoreApplication::translate("MainWindow", "\354\236\254\355\203\235", nullptr));
-        label_15->setText(QCoreApplication::translate("MainWindow", "\354\240\204\354\235\274", nullptr));
-        label_16->setText(QCoreApplication::translate("MainWindow", "\355\234\264\353\254\264", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(daily_tab), QCoreApplication::translate("MainWindow", "Tab 2", nullptr));
         deployPushButton->setText(QCoreApplication::translate("MainWindow", "&Deploy", nullptr));
         refreshPushButton->setText(QCoreApplication::translate("MainWindow", "&Refresh", nullptr));
