@@ -11,8 +11,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
     bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
     void setDay(QDate date);
+    void setTablename(QString name);
 private:
     QDate day;
+    QString tablename;
 public slots:
     bool clearMonth(QDate date);
 

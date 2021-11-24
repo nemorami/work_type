@@ -20,10 +20,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void readDataFile();
+    void init();
 
     QString getNextWorktype(QString part, QString init_work);
     QPair<QString, QDate> getLastWorktype(QString name);
+    void readInitFile();
+    void writeInitFile();
 
 
 private:
@@ -35,12 +37,15 @@ private:
     QSqlQueryModel daily_name_model;
 
 
+
 private slots:
     void on_refreshPushButton_clicked();
     void on_deployPushButton_clicked();
     void on_savePushButton_clicked();
     void on_clearPushButton_clicked();
     void on_tabWidget_currentChanged(int index);
+    void on_lineEdit_editingFinished();
+    void on_aboutPushButton_clicked();
 //    void setTodayReport();
     void showMonth();
     void showDaily();

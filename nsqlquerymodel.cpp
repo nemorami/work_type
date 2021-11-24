@@ -30,12 +30,13 @@ bool NSqlQueryModel::setData(const QModelIndex &index, const QVariant &value, in
     work = value.toString();
 
     // work가 2자가 아니거나 전비주보휴로 시작하지 않으면 입력하지 않는다.
-    if(work.size() != 2 or !QString("전비주보휴").contains(work[0]))
+    if(work.size() != 2 or !QString("전비주보휴야").contains(work[0]))
         return false;
-
+    //TODO
+    // 테이블 이름 수정
     if (index.isValid() && role == Qt::EditRole) {
         QSqlQuery query;
-        query.prepare("insert into daily(day, name, work) values(:day, :name, :work) on conflict(day, name) do update set work = :work");
+        query.prepare(QString("insert into %1(day, name, work) values(:day, :name, :work) on conflict(day, name) do update set work = :work").arg(tablename));
         query.bindValue(":work", work);
         query.bindValue(":name", name);
         query.bindValue(":day", day);
@@ -56,10 +57,15 @@ void NSqlQueryModel::setDay(QDate date)
 
 }
 
+void NSqlQueryModel::setTablename(QString name)
+{
+    tablename = name + "_daily";
+}
+
 bool NSqlQueryModel::clearMonth(QDate date)
 {
     QSqlQuery query;
-    query.prepare(QString("delete from daily where day like '%1-%2%'").arg(date.year()).arg(date.month()));
+    query.prepare(QString("delete from %1 where day like '%2-%3%'").arg(tablename).arg(date.year()).arg(date.month()));
 
 
     if(!query.exec())
