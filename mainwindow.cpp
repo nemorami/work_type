@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     if(ui->lineEdit->text().isEmpty()){
         QMessageBox *msgBox = new QMessageBox(this);
         msgBox->setIcon(QMessageBox::Information);
-        msgBox->setText("과명을 입력하세요");
+        msgBox->setText("세관_과명을 <span style=color:red><b>공백없이</b></span> 입력하세요");
         msgBox->addButton("&Ok", QMessageBox::ApplyRole);
         msgBox->setAttribute(Qt::WA_DeleteOnClose);
         msgBox->setModal(false);
@@ -81,7 +81,7 @@ void MainWindow::init()
     if(query.next()) {
         if(query.value(0).toInt() == 0){
             // dictionary 테이블이 없으면
-            query.exec(QString("create table %1_work_type (name text, part text, work_patterns text, primary key(name))").arg(depart));
+            query.exec(QString("create table %1_work_type (name text, part text not null, work_patterns text not null, primary key(name))").arg(depart));
             query.exec(QString("create table %1_daily(day text, name text, work text, primary key(day, name))").arg(depart));
 
         }
@@ -119,10 +119,11 @@ void MainWindow::init()
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &MainWindow::customMenuRequested);
     connect(&month_model, &NSqlQueryModel::dataChanged, this, &MainWindow::showMonth);
 
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->dailyTableView2->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
     ui->dailyTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->dailyTableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->dailyTableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->dailyTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     ui->dailyTableView2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
@@ -151,10 +152,6 @@ void MainWindow::on_deployPushButton_clicked()
     QDate date;
 
     for (auto &deploy : work_deploys ) {
-        auto work_type = getLastWorktype(deploy.name);
-        auto w = work_type.first;
-        date = work_type.second;
-        //qDebug() << "return getLastWorktype=>" << date;
         QDate today = ui->dateEdit->date();
 
         auto insert = [&query, this](QDate &date, QString &name, QString &work){
@@ -165,17 +162,35 @@ void MainWindow::on_deployPushButton_clicked()
             query.exec();
         };
 
-        if(w == nullptr) {
-            date = QDate(today.year(), today.month(), 1);
-            w = QString("%1%2").arg(deploy.work[0]).arg(1);
-            insert(date, deploy.name, w);
+        qDebug() << deploy.name << deploy.work;
 
+        if(deploy.work == "정상"){
+            // 휴일이면 휴무
+            //아니면 정상...
+            for(date = QDate(today.year(), today.month(), 1); date.month() <= today.month();date = date.addDays(1)) {
+                qDebug() << date.dayOfWeek();
+                QString w = (date.dayOfWeek() == 6 || date.dayOfWeek() == 7) ? "휴무" : "정상";
+                insert(date, deploy.name, w);
+            }
+            continue;
+        }else {
+            auto work_type = getLastWorktype(deploy.name);
+            auto w = work_type.first;
+            date = work_type.second;
+            //qDebug() << "return getLastWorktype=>" << date;
+
+            if(w == nullptr) {
+                date = QDate(today.year(), today.month(), 1);
+                w = QString("%1%2").arg(deploy.work[0]).arg(1);
+                insert(date, deploy.name, w);
+
+            }
+            //qDebug() << "date => " << date;
+            for(date = date.addDays(1); date <= QDate(today.year(),today.month(), today.daysInMonth());date = date.addDays(1)) {
+                w = getNextWorktype(deploy.work, w);
+                insert(date, deploy.name, w);
+            }
         }
-        //qDebug() << "date => " << date;
-        for(date = date.addDays(1); date <= QDate(today.year(),today.month(), today.daysInMonth());date = date.addDays(1)) {
-            w = getNextWorktype(deploy.work, w);
-            insert(date, deploy.name, w);
-        }   
     }
 
     showMonth();
@@ -222,7 +237,7 @@ void MainWindow::on_lineEdit_editingFinished()
 void MainWindow::on_aboutPushButton_clicked()
 {
     //todo: 버전 빌드 연동...
-    QMessageBox::about(this, "Work Dploy", QString("version: %1").arg("0.0.1"));
+    QMessageBox::about(this, "Work Dploy", QString("version: %1").arg("0.0.2"));
 
 }
 
@@ -239,6 +254,9 @@ QString MainWindow::getNextWorktype(QString part, QString init_work)
 
     //QString work_list = query.value(0).toString();
     // init_work를 work와 index로 분리 ex) 주2: work => 주, index => 2
+
+    if(part.isEmpty())
+        return nullptr;
     QChar work = init_work[0];
     int index = init_work.remove(0,1).toInt();
     // 다음 근무일 위치를 구한다.
@@ -277,18 +295,6 @@ QPair<QString, QDate> MainWindow::getLastWorktype(QString name)
         if(QString("주전비보").contains(work[0]))
                 break;
     }
-    /*
-    if(work == nullptr) {
-        query.prepare("select work_patterns from work_type where name = :name");
-        query.bindValue(":name", name);
-        query.exec();
-        query.next();
-
-        work = QString("%1%2").arg(query.value(0).toString()[0]).arg(1);
-        date = QDate(1970,1,1);//ui->dateEdit->date().addDays(-ui->dateEdit->date().day());
-
-    }
-    */
 
     return QPair<QString, QDate>(work, date);
 }
@@ -312,126 +318,6 @@ void MainWindow::on_refreshPushButton_clicked()
     showDaily();
 }
 
-//void MainWindow::setTodayReport()
-//{
-//    QSqlQuery query;
-
-
-//    query.prepare("select count(*) 현원,\
-//            sum(case when substr(work, 1,1) in('전', '주', '보') then 1 end) 근무,\
-//            sum(case when substr(work, 1,1) = '비' then 1 end) 비번,\
-//            sum(case when substr(work, 1,1) = '전' then 1 end) 전일, \
-//            sum(case when substr(work, 1,1) = '연' then 1 end) 연가\
-//            from daily where day = :date");
-//    query.bindValue(":date", ui->dateEdit->date().toString("yyyy-MM-dd"));
-//    query.exec();
-
-//    if(query.next()) {
-//        ui->lbFix->setText(query.value("현원").toString());
-//        ui->lbCurrent->setText(query.value("근무").toString());
-//        ui->lbOff->setText(query.value("비번").toString());
-//        ui->lbVacation->setText(query.value("연가").toString());
-//        ui->lbAll->setText(query.value("전일").toString());
-
-//    }
-
-//    query.prepare("select part 구분, work, d.name 이름\
-//           from (select name, substr(work, 1, 1) work from daily where day = :date) d \
-//             join work_type wt on d.name = wt.name");
-//    query.bindValue(":date", ui->dateEdit->date().toString("yyyy-MM-dd"));
-//    query.exec();
-
-//    QString part=nullptr;
-//    QString normal_str = nullptr;
-//    QString home_str = nullptr;
-//    QString all_str = nullptr;
-//    QString off_str = nullptr;
-
-//    /**
-//     *리포트 이름 출력 부분 초기화
-//     */
-
-
-
-
-//    for (auto &l :{ui->partVerticalLayout, ui->normalVerticalLayout, ui->homeVerticalLayout, ui->allVerticalLayout, ui->offVerticalLayout} ) {
-//       if(l->count() <= 1)
-//           break;
-//        QLayoutItem *item;
-//        while ((item = l->takeAt(1)) != nullptr) {
-//            //Q_ASSERT(!item->layout());
-//            delete item->widget();
-//            delete item;
-//        }
-
-//    }
-
-
-//    lbnPart.clear();
-//    lbnNormal.clear();
-//    lbnHome.clear();
-//    lbnAll.clear();
-//    lbnOff.clear();
-
-//    while(query.next()) {
-
-//        QString w = query.value("work").toString();
-//        if(part != query.value("구분").toString()) {
-//            qDebug() << "part:" << part << ":" << query.value("구분").toString() << " all => " << normal_str;
-
-//            if(!part.isNull()){
-//                lbnPart.last()->setText(part);
-//                lbnNormal.last()->setText(normal_str);
-//                lbnAll.last()->setText(all_str);
-//                lbnHome.last()->setText(home_str);
-//                lbnOff.last()->setText(off_str);
-//            }
-
-//            lbnPart.append(new QLabel());
-//            lbnNormal.append(new QLabel());
-//            lbnHome.append(new QLabel());
-//            lbnAll.append(new QLabel());
-//            lbnOff.append(new QLabel());
-
-//            part = query.value("구분").toString();
-
-
-//            ui->partVerticalLayout->addWidget(lbnPart.last());
-//            ui->normalVerticalLayout->addWidget(lbnNormal.last());
-//            ui->homeVerticalLayout->addWidget(lbnHome.last());
-//            ui->allVerticalLayout->addWidget(lbnAll.last());
-//            ui->offVerticalLayout->addWidget(lbnOff.last());
-
-//            normal_str = all_str = home_str = off_str = nullptr;
-//            if( w == "주")
-//                normal_str = query.value("이름").toString().append("\n");
-//            else if(w == "전")
-//                all_str = query.value("이름").toString().append("\n");
-//            else if(w == "비")
-//                off_str = query.value("이름").toString().append("\n");
-
-//        }
-//        else {
-//            if( w == "주")
-//                normal_str += query.value("이름").toString().append("\n");
-//            else if(w == "전")
-//                all_str += query.value("이름").toString().append("\n");
-//            else if(w == "비")
-//                off_str += query.value("이름").toString().append("\n");
-
-//        }
-//    }
-
-//    lbnPart.last()->setText(part);
-//    lbnNormal.last()->setText(normal_str);
-//    lbnAll.last()->setText(all_str);
-//    lbnHome.last()->setText(home_str);
-//    lbnOff.last()->setText(off_str);
-
-
-
-
-//}
 
 void MainWindow::showMonth()
 {
@@ -521,10 +407,11 @@ void MainWindow::showDaily()
     setModelDay();
     QString daily = QString("select count(*) 현원,\
             sum(case when substr(work, 1,1) in('전', '주', '보') then 1 end) 근무,\
-            sum(case when substr(work, 1,1) = '전' then 1 end) 전일, \
+            sum(case when substr(work, 1,1) = '주' then 1 end) 주간, \
             sum(case when substr(work, 1,1) = '야' then 1 end) 야간, \
             sum(case when substr(work, 1,1) = '비' then 1 end) 비번, \
-            sum(case when substr(work, 1,1) = '휴' then 1 end) 휴가 \
+            sum(case when substr(work, 1,1) = '휴' then 1 end) 휴무, \
+            sum(case when substr(work, 1,1) = '연' then 1 end) 연가 \
             from %1_daily where day = '%2'").arg(ui->lineEdit->text()).arg(ui->dateEdit->date().toString("yyyy-MM-dd"));
     daily_model.setQuery(daily);
     ui->dailyTableView->setModel(&daily_model);
@@ -532,9 +419,11 @@ void MainWindow::showDaily()
    QString daily_name = QString("select part \"구분\", \
                                         string_agg(case when work = '주' then d.name end, ', ') \"주간\",\
                                         string_agg(case when work = '전' then d.name end, ', ') \"전일\",\
+                                        string_agg(case when work = '정' then d.name end, ', ') \"정상\",\
                                         string_agg(case when work = '야' then d.name end, ', ') \"야간\",\
                                         string_agg(case when work = '비' then d.name end, ', ') \"비번\", \
-                                        string_agg(case when work = '휴' then d.name end, ', ') \"휴가\" \
+                                        string_agg(case when work = '휴' then d.name end, ', ') \"휴무\", \
+                                        string_agg(case when work = '연' then d.name end, ', ') \"연가\" \
                                   from (select name, substr(work, 1, 1) \"work\" from %1_daily where day = '%2') d \
                                    join %1_work_type wt on d.name = wt.name \
                                   group by 1").arg(ui->lineEdit->text()).arg(ui->dateEdit->date().toString("yyyy-MM-dd"));
